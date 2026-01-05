@@ -93,6 +93,10 @@ func main() {
 	// Public routes
 	r.POST("/api/v1/register", authHandler.Register)
 
+	// Admin login (public)
+	adminAuthHandler := &handlers.AdminAuthHandler{JWTSecret: cfg.JWTSecret}
+	r.POST("/api/v1/admin/login", adminAuthHandler.AdminLogin)
+
 	// Protected routes
 	protected := r.Group("/api/v1")
 	protected.Use(middleware.AuthMiddleware(cfg.JWTSecret))
