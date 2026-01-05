@@ -321,8 +321,8 @@ func (h *AdminHandler) GetTransactions(c *gin.Context) {
 	offset := (page - 1) * limit
 
 	query := "SELECT id, user_id, type, category, amount, balance_after, description, date FROM transactions WHERE 1=1"
-	args := []interface{}{limit, offset}
-	argCount := 2
+	args := []interface{}{}
+	argCount := 0
 
 	if userID != "" {
 		argCount++
@@ -348,7 +348,14 @@ func (h *AdminHandler) GetTransactions(c *gin.Context) {
 		args = append(args, dateTo)
 	}
 
-	query += " ORDER BY date DESC LIMIT $1 OFFSET $2"
+	// Add LIMIT and OFFSET last
+	argCount++
+	query += " ORDER BY date DESC LIMIT $" + strconv.Itoa(argCount)
+	args = append(args, limit)
+
+	argCount++
+	query += " OFFSET $" + strconv.Itoa(argCount)
+	args = append(args, offset)
 
 	rows, err := database.DB.Query(query, args...)
 	if err != nil {
